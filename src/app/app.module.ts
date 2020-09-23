@@ -8,6 +8,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import {MatSliderModule} from '@angular/material/slider';
 
 import { AppComponent } from './app.component';
 import 'hammerjs';
@@ -32,6 +33,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { HttpClientModule } from'@angular/common/http';
+import { baseURL } from './shared/baseurl';
 
 @NgModule({
   declarations: [
@@ -54,6 +57,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatSelectModule,
     MatSlideToggleModule,
     MatCheckboxModule,
+    MatSliderModule,
     FlexLayoutModule,
     MatListModule,
     MatIconModule,
@@ -64,10 +68,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     AppRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   providers: [
-    DishService
+    DishService,
+    {provide: 'BaseURL', useValue: baseURL}
   ], 
   entryComponents: [
     LoginComponent
