@@ -5,6 +5,7 @@ import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { switchMap } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ProcessHTTPMsgService } from '../services/process-httpmsg.service';
 
 @Component({
   selector: 'app-dishdetail',
@@ -17,6 +18,8 @@ export class DishdetailComponent implements OnInit {
     prev: string;
     next: string;
     datestring:string;
+    errMess: string;
+    dishcopy: Dish;
     @ViewChild('fform') commentFormDirective;
     commentForm:FormGroup;
     formErrors = {
@@ -32,9 +35,10 @@ export class DishdetailComponent implements OnInit {
         'required':      'Comment is required.'
       }
     }
-  constructor(private dishservice: DishService,
+  constructor(private dishService: DishService,
     private route: ActivatedRoute,
     private location: Location,
+    private ProcessHTTPMsgService:ProcessHTTPMsgService,
     private fb: FormBuilder) { 
       this.createForm();
     }
@@ -74,13 +78,20 @@ export class DishdetailComponent implements OnInit {
       var d=new Date();
       this.commentForm.patchValue({date:d.toISOString()});
       console.log(this.commentForm.value);
+      this.dishcopy.comments.push(this.commentForm.value);
       this.dish.comments.push(this.commentForm.value);
+      this.dishService.putDish(this.dishcopy)
+      .subscribe(dish => {
+        this.dish = dish; this.dishcopy = dish;
+      },
+      errmess => { this.dish = null; this.dishcopy = null; this.errMess = <any>errmess; });
       this.commentFormDirective.resetForm({rating:5});
     }
   ngOnInit() {
-    this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
-    this.route.params.pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
-    .subscribe(dish => { this.dish = dish; this.setPrevNext(dish.id); });
+    this.dishService.getDishIds().subscribe(dishIds => this.dishIds = dishIds,
+      errmess => this.errMess = <any>errmess);
+    this.route.params.pipe(switchMap((params: Params) => this.dishService.getDish(params['id'])))
+    .subscribe(dish => { this.dish = dish;this.dishcopy = dish;  this.setPrevNext(dish.id); });
   }
   setPrevNext(dishId: string) {
     const index = this.dishIds.indexOf(dishId);
